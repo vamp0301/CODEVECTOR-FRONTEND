@@ -14,17 +14,11 @@ export default function Home() {
   const [nextCursor, setNextCursor] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch first page
-  useEffect(() => {
-    fetchProducts(true);
-  }, [selectedCategory]);
-
   const fetchProducts = async (reset = false) => {
     try {
       setLoading(true);
 
       let url = "/products";
-
       const params = [];
 
       if (selectedCategory !== "All") {
@@ -32,13 +26,8 @@ export default function Home() {
       }
 
       if (!reset && nextCursor) {
-        params.push(
-          `cursorCreatedAt=${nextCursor.createdAt}`
-        );
-
-        params.push(
-          `cursorId=${nextCursor.id}`
-        );
+        params.push(`cursorCreatedAt=${nextCursor.createdAt}`);
+        params.push(`cursorId=${nextCursor.id}`);
       }
 
       if (params.length > 0) {
@@ -58,16 +47,19 @@ export default function Home() {
 
       setNextCursor(response.data.nextCursor);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-   <main className="min-h-screen bg-slate-100 p-8">
-      <div className="max-w-6xl mx-auto">
+  useEffect(() => {
+    fetchProducts(true);
+  }, [selectedCategory]);
 
+  return (
+    <main className="min-h-screen bg-slate-100 p-8">
+      <div className="max-w-6xl mx-auto">
         <Header />
 
         <div className="mb-8 flex justify-center">
@@ -77,7 +69,7 @@ export default function Home() {
           />
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid gap-6 md:grid-cols-3">
           {products.map((product) => (
             <ProductCard
               key={product._id}
@@ -95,7 +87,7 @@ export default function Home() {
         )}
 
         {loading && (
-          <p className="text-center mt-5">
+          <p className="text-center mt-5 text-gray-500">
             Loading...
           </p>
         )}
